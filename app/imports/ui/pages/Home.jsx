@@ -19,7 +19,7 @@ import { ComponentIDs, PageIDs } from '../utilities/ids';
 
 /* Create a schema to specify the structure of the data to appear in the form. */
 const makeSchema = (allInterests, allProjects) => new SimpleSchema({
-  email: { type: String, label: 'Email', optional: true },
+  email: { type: String, label: 'Email', optional: false },
   firstName: { type: String, label: 'First', optional: true },
   lastName: { type: String, label: 'Last', optional: true },
   bio: { type: String, label: 'Biographical statement', optional: true },
@@ -65,7 +65,10 @@ const Home = () => {
   // Now create the model with all the user information.
   const projects = _.pluck(ProfilesProjects.collection.find({ profile: email }).fetch(), 'project');
   const interests = _.pluck(ProfilesInterests.collection.find({ profile: email }).fetch(), 'interest');
-  const profile = Profiles.collection.findOne({ email });
+  let profile = Profiles.collection.findOne({ email });
+  if (!profile) {
+    profile = { email, firstName: '', lastName: '', bio: '', title: '', picture: '', interests, projects };
+  }
   const model = _.extend({}, profile, { interests, projects });
   return ready ? (
     <Container id={PageIDs.homePage} className="justify-content-center" style={pageStyle}>
